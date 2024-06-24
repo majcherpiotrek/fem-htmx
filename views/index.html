@@ -6,7 +6,7 @@
   <title></title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/index.css" rel="stylesheet" />
   <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.js"
     integrity="sha384-qbtR4rS9RrUMECUWDWM2+YGgN3U4V4ZncZ0BvUcg9FGct0jqXz3PUdVpU1p0yrXS"
     crossorigin="anonymous"></script>
@@ -63,10 +63,13 @@
 {{ end }}
 
 {{ block "contact" . }}
-<li>
+<li class="contact">
   {{ template "deleteButton" . }}
   Name: {{ .Name }}
   Email: {{ .Email }}
+  <div id="deleting-{{ .Id }}" class="htmx-indicator" style="display: inline-block;">
+    <img src="/images/bars.svg" alt="loading" style="width: 1rem;" />
+  </div>
 </li>
 {{ end }}
 
@@ -85,7 +88,8 @@
 {{ end }}
 
 {{ block "deleteButton" . }}
-<button hx-target="closest li" hx-swap="outerHTML" hx-delete="/contacts/{{ .Id }}" type="button"
+<button hx-indicator="#deleting-{{ .Id }}" hx-target="closest li" hx-swap="outerHTML swap:500ms"
+  hx-delete="/contacts/{{ .Id }}" type="button"
   style="width: 1rem; height: 1rem; padding: 0; border: none; cursor: pointer; background-color: transparent;">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path fill="none" d="M0 0h24v24H0z" />

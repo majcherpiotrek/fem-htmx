@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -96,6 +97,9 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Logger.SetLevel(log.INFO)
 
+	e.Static("/images", "images")
+	e.Static("/css", "css")
+
 	appState := AppState{
 		Contacts:  Contacts{},
 		FormState: newFormState(),
@@ -107,6 +111,8 @@ func main() {
 	})
 
 	e.POST("/contacts", func(c echo.Context) error {
+		time.Sleep(1 * time.Second)
+
 		name := c.FormValue("name")
 		email := c.FormValue("email")
 
@@ -150,6 +156,8 @@ func main() {
 	})
 
 	e.GET("/contacts", func(c echo.Context) error {
+		time.Sleep(1 * time.Second)
+
 		err := c.Render(200, "contactsCount", appState.Contacts)
 
 		if err != nil {
@@ -159,6 +167,8 @@ func main() {
 	})
 
 	e.DELETE("/contacts/:id", func(c echo.Context) error {
+		time.Sleep(1 * time.Second)
+
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 
