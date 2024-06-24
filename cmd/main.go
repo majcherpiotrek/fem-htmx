@@ -123,7 +123,23 @@ func main() {
 		if err != nil {
 			return c.HTML(500, "Something went wrong")
 		}
+
+		err = c.Render(200, "contactsCount", appState.Contacts)
+
+		if err != nil {
+			return c.HTML(500, "Something went wrong")
+		}
+
 		return c.Render(200, "contactForm", appState)
+	})
+
+	e.GET("/contacts", func(c echo.Context) error {
+		err := c.Render(200, "contactsCount", appState.Contacts)
+
+		if err != nil {
+			return c.HTML(500, "Something went wrong")
+		}
+		return c.Render(200, "contacts", appState)
 	})
 
 	e.Logger.Fatal(e.Start(":42069"))

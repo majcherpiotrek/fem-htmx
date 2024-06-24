@@ -26,11 +26,18 @@
 <body>
   {{ template "contactForm" . }}
   <hr />
-  <h1>Contacts ({{ len .Contacts }})</h1>
+  <div style="display: flex; align-items: baseline;">
+    <h1 style="margin-right: 0.5rem;">Contacts ({{ template "contactsCount" .Contacts }})</h1>
+    <button type="button" hx-get="/contacts" hx-target="#contacts" hx-swap="outerHTML">Refresh</button>
+  </div>
   {{ template "contacts". }}
 </body>
 
 </html>
+{{ end }}
+
+{{ block "contactsCount" . }}
+<span id="contactsCount" hx-swap-oob="innerHTML">{{ len . }}</span>
 {{ end }}
 
 {{ block "contactForm" . }}
@@ -71,7 +78,7 @@
 {{ end }}
 
 {{ block "new-contact" . }}
-<ul id="contacts" hx-swap-oob="afterbegin">
+<ul id="contacts" hx-swap-oob="beforeend">
   {{ template "contact" . }}
 </ul>
 {{ end }}
