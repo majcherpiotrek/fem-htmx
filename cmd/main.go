@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"io"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,7 +24,10 @@ func newTemplate() *Templates {
 	}
 }
 
+var id = 0
+
 type Contact struct {
+	Id    int
 	Name  string
 	Email string
 }
@@ -73,8 +77,18 @@ func (appState *AppState) hasContact(c *Contact) bool {
 	return false
 }
 
-func newContact(name string, email string) Contact {
-	return Contact{name, email}
+func (appState *AppState) indexOfContactWithId(id int) int {
+	for i, contact := range appState.Contacts {
+		if contact.Id == id {
+			return i
+		}
+
+	}
+	return -1
+}
+
+func newContact(id int, name, email string) Contact {
+	return Contact{id, name, email}
 }
 
 func main() {
@@ -96,7 +110,7 @@ func main() {
 		name := c.FormValue("name")
 		email := c.FormValue("email")
 
-		contact := newContact(name, email)
+		contact := newContact(id, name, email)
 
 		appState.FormState = newFormState()
 		appState.FormState.setFieldValue("name", name)
@@ -106,7 +120,7 @@ func main() {
 			appState.FormState.setFieldError("email", "A user with this email already exists")
 		}
 
-		if len(name) > 10 {
+		if len(name) > 80 {
 			appState.FormState.setFieldError("name", "Max length of a name is 10")
 		}
 
@@ -124,6 +138,8 @@ func main() {
 			return c.HTML(500, "Something went wrong")
 		}
 
+		id++
+
 		err = c.Render(200, "contactsCount", appState.Contacts)
 
 		if err != nil {
@@ -140,6 +156,31 @@ func main() {
 			return c.HTML(500, "Something went wrong")
 		}
 		return c.Render(200, "contacts", appState)
+	})
+
+	e.DELETE("/contacts/:id", func(c echo.Context) error {
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
+
+		if err != nil {
+			return c.HTML(400, "Invalid id parameter")
+		}
+
+		indexOfContact := appState.indexOfContactWithId(id)
+
+		if indexOfContact == -1 {
+			return c.HTML(404, "Contact with this id not found")
+		}
+
+		appState.Contacts = append(appState.Contacts[:indexOfContact], appState.Contacts[indexOfContact+1:]...)
+
+		err = c.Render(200, "contactsCount", appState.Contacts)
+
+		if err != nil {
+			return c.HTML(500, "Something went wrong")
+		}
+
+		return c.NoContent(200)
 	})
 
 	e.Logger.Fatal(e.Start(":42069"))
