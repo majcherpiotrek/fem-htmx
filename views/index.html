@@ -26,6 +26,7 @@
 <body>
   {{ template "contactForm" . }}
   <hr />
+  <h1>Contacts ({{ len .Contacts }})</h1>
   {{ template "contacts". }}
 </body>
 
@@ -37,7 +38,7 @@
   <div>
     <label for="name">Name:</label>
     <input {{ if .FormState.Values.name }} value="{{ .FormState.Values.name }}" {{ end }} id="name" name="name"
-      placeholder="Name" type="text" />
+      placeholder="Name" type="text" autofocus />
     {{ if .FormState.Errors.name }}
     <div style="color: red">{{ .FormState.Errors.name }}</div>
     {{ end }}
@@ -54,30 +55,23 @@
 </form>
 {{ end }}
 
-{{ block "contacts" . }}
-<div id="contacts">
-  <h1>Contacts ({{ len .Contacts }})</h1>
-  <ul>
-    {{ range .Contacts }}
-    <li>
-      Name: {{ .Name }}
-      Email: {{ .Email }}
-    </li>
-    {{ end }}
-  </ul>
-</div>
+{{ block "contact" . }}
+<li>
+  Name: {{ .Name }}
+  Email: {{ .Email }}
+</li>
 {{ end }}
 
-{{ block "oob-contacts" . }}
-<div id="contacts" hx-swap-oob="outerHTML">
-  <h1>Contacts ({{ len .Contacts }})</h1>
-  <ul>
-    {{ range .Contacts }}
-    <li>
-      Name: {{ .Name }}
-      Email: {{ .Email }}
-    </li>
-    {{ end }}
-  </ul>
-</div>
+{{ block "contacts" . }}
+<ul id="contacts">
+  {{ range .Contacts }}
+  {{ template "contact" . }}
+  {{ end }}
+</ul>
+{{ end }}
+
+{{ block "new-contact" . }}
+<ul id="contacts" hx-swap-oob="afterbegin">
+  {{ template "contact" . }}
+</ul>
 {{ end }}

@@ -118,7 +118,7 @@ func main() {
 
 		appState.Contacts = append(appState.Contacts, contact)
 
-		err := c.Render(200, "oob-contacts", appState)
+		err := c.Render(200, "new-contact", contact)
 
 		if err != nil {
 			return c.HTML(500, "Something went wrong")
