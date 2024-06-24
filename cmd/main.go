@@ -34,6 +34,16 @@ type AppState struct {
 	Contacts Contacts
 }
 
+func (appState *AppState) hasContact(c *Contact) bool {
+	for _, contact := range appState.Contacts {
+		if contact.Email == c.Email {
+			return true
+		}
+
+	}
+	return false
+}
+
 func newContact(name string, email string) Contact {
 	return Contact{name, email}
 }
@@ -57,6 +67,13 @@ func main() {
 		email := c.FormValue("email")
 
 		contact := newContact(name, email)
+		// TODO: Refactor it so that the response for form submission always updates the form itself and also returns the success message
+
+		if appState.hasContact(&contact) {
+			c.Response().Header().Add("HX-Retarget", "#error")
+			c.Response().Header().Add("HX-Reswap", "innerHTML")
+			return c.HTML(echo.ErrUnprocessableEntity.Code, "Contact with this email already exists")
+		}
 
 		appState.Contacts = append(appState.Contacts, contact)
 

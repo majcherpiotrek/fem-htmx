@@ -10,6 +10,17 @@
   <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.js"
     integrity="sha384-qbtR4rS9RrUMECUWDWM2+YGgN3U4V4ZncZ0BvUcg9FGct0jqXz3PUdVpU1p0yrXS"
     crossorigin="anonymous"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+      document.body.addEventListener('htmx:beforeSwap', function (evt) {
+        console.log(evt.detail.xhr);
+        if (evt.detail.xhr.status === 422 || evt.detail.xhr.status === 409) {
+          evt.detail.shouldSwap = true;
+          evt.detail.isError = false;
+        }
+      });
+    })
+  </script>
 </head>
 
 <body>
@@ -22,7 +33,8 @@
 {{ end }}
 
 {{ block "contactForm" . }}
-<form hx-post="/contacts" hx-target="#contacts" style="display: flex; flex-direction: column; row-gap: 1rem;">
+<form hx-post="/contacts" hx-swap="outerHTML" hx-target="#contacts"
+  style="display: flex; flex-direction: column; row-gap: 1rem;">
   <div>
     <label for="name">Name:</label>
     <input id="name" name="name" type="text" />
@@ -31,6 +43,7 @@
     <label for="email">Email:</label>
     <input id="email" name="email" type="email" />
   </div>
+  <div style="color: red;" id="error"></div>
   <button style="width: 5rem;">Save</button>
 </form>
 {{ end }}
