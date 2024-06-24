@@ -33,23 +33,43 @@
 {{ end }}
 
 {{ block "contactForm" . }}
-<form hx-post="/contacts" hx-swap="outerHTML" hx-target="#contacts"
-  style="display: flex; flex-direction: column; row-gap: 1rem;">
+<form hx-post="/contacts" hx-swap="outerHTML" style="display: flex; flex-direction: column; row-gap: 1rem;">
   <div>
     <label for="name">Name:</label>
-    <input id="name" name="name" type="text" />
+    <input {{ if .FormState.Values.name }} value="{{ .FormState.Values.name }}" {{ end }} id="name" name="name"
+      placeholder="Name" type="text" />
+    {{ if .FormState.Errors.name }}
+    <div style="color: red">{{ .FormState.Errors.name }}</div>
+    {{ end }}
   </div>
   <div>
     <label for="email">Email:</label>
-    <input id="email" name="email" type="email" />
+    <input {{ if .FormState.Values.email }} value="{{ .FormState.Values.email }}" {{ end }} id="email" name="email"
+      placeholder="Email" type="email" />
+    {{ if .FormState.Errors.email }}
+    <div style="color: red">{{ .FormState.Errors.email }}</div>
+    {{ end }}
   </div>
-  <div style="color: red;" id="error"></div>
   <button style="width: 5rem;">Save</button>
 </form>
 {{ end }}
 
 {{ block "contacts" . }}
 <div id="contacts">
+  <h1>Contacts ({{ len .Contacts }})</h1>
+  <ul>
+    {{ range .Contacts }}
+    <li>
+      Name: {{ .Name }}
+      Email: {{ .Email }}
+    </li>
+    {{ end }}
+  </ul>
+</div>
+{{ end }}
+
+{{ block "oob-contacts" . }}
+<div id="contacts" hx-swap-oob="outerHTML">
   <h1>Contacts ({{ len .Contacts }})</h1>
   <ul>
     {{ range .Contacts }}
